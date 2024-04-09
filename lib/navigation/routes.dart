@@ -6,6 +6,6 @@ import '../text_test/ui/text_test.dart';
 
 Map<String, WidgetBuilder> routes = {
   '/': (context) => HomePage(),
-  '/text_test': (context) => TextTest(),
+  '/text_test': (context) => const TextTest(),
   '/blur_image': (context) => const BlurImage(),
 };
