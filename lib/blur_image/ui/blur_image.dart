@@ -6,7 +6,6 @@ import 'package:ffi/ffi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-typedef HelloFunction = Pointer<Utf8> Function(Pointer<Utf8>);
 typedef ProcessImage = Pointer<Uint8> Function(
     Pointer<Uint8>, Int32, Int32, Int32);
 typedef ProcessImageDart = Pointer<Uint8> Function(
@@ -20,8 +19,8 @@ class BlurImage extends StatefulWidget {
 }
 
 class _BlurImageState extends State<BlurImage> {
-  String _screenText = 'initial text';
   ui.Image? _resultImage;
+  String? _processingTime;
 
   String _getLibraryPath() {
     if (Platform.isAndroid) {
@@ -29,24 +28,6 @@ class _BlurImageState extends State<BlurImage> {
     } else {
       throw Exception('Unsupported platform');
     }
-  }
-
-  void _callHello() async {
-    DynamicLibrary cppLib = DynamicLibrary.open(_getLibraryPath());
-    var helloFunc =
-        cppLib.lookupFunction<HelloFunction, HelloFunction>('hello');
-    var inputString = 'good';
-    var inputCString = inputString.toNativeUtf8();
-
-    // Call the native function with the C string
-    var resultPointer = helloFunc(inputCString);
-
-    // Convert the result back to Dart string
-    var resultString = resultPointer.toDartString();
-
-    setState(() {
-      _screenText = 'Sent $inputString got $resultString';
-    });
   }
 
   Future<Uint8List> _processImage(
@@ -72,6 +53,7 @@ class _BlurImageState extends State<BlurImage> {
   }
 
   Future<void> _sendImage() async {
+    Stopwatch stopwatch = Stopwatch()..start();
     // Load the image asset
     ByteData imageData = await rootBundle.load('assets/images/face.png');
 
@@ -91,8 +73,8 @@ class _BlurImageState extends State<BlurImage> {
     ui.decodeImageFromPixels(
         processedImage, width, height, ui.PixelFormat.rgba8888, (result) {
       setState(() {
-        _screenText = 'Image processed';
         _resultImage = result;
+        _processingTime = stopwatch.elapsed.inMilliseconds.toString();
       });
     });
   }
@@ -102,40 +84,52 @@ class _BlurImageState extends State<BlurImage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Process Image using c++'),
+        title: const Text('Blur Image using c++'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              _screenText,
-              style: Theme.of(context).textTheme.headlineMedium,
+            const SizedBox(height: 20),
+            _ImageAndCaption(
+              image: Image.asset('assets/images/face.png'),
+              caption: 'Input Image',
             ),
             const SizedBox(height: 20),
-            SizedBox(
-              height: 200,
-              width: 200,
-              child: Image.asset('assets/images/face.png'),
-            ),
             ElevatedButton(
               onPressed: _sendImage,
               child: const Text('Send Image'),
             ),
+            const SizedBox(height: 20),
             if (_resultImage != null)
-              SizedBox(
-                height: 200,
-                width: 200,
-                child: RawImage(image: _resultImage),
-              )
+              _ImageAndCaption(
+                image: RawImage(image: _resultImage!),
+                caption: 'Image processed in ${_processingTime}ms',
+              ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _callHello,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
+    );
+  }
+}
+
+class _ImageAndCaption extends StatelessWidget {
+  final Widget image;
+  final String caption;
+
+  const _ImageAndCaption({required this.image, required this.caption});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          width: 200,
+          child: image,
+        ),
+        Text(caption),
+      ],
     );
   }
 }
