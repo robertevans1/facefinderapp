@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'home/ui/home_page.dart';
+import 'navigation/routes.dart';
 
 void main() {
   runApp(const FaceFinderApp());
@@ -17,7 +17,7 @@ class FaceFinderApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const HomePage(),
+      routes: routes,
     );
   }
 }
