@@ -18,13 +18,3 @@ class ImageBytes {
     required this.format,
   });
 }
-
-// final class ImageData extends Struct {
-//   @Int32()
-//   external int width;
-//
-//   @Int32()
-//   external int height;
-//
-//   external Pointer<Uint8> data;
-// }

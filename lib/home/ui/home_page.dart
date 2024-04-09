@@ -13,9 +13,7 @@ typedef ProcessImageDart = Pointer<Uint8> Function(
     Pointer<Uint8>, int, int, int);
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.title});
-
-  final String title;
+  const HomePage();
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -75,7 +73,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _sendImage() async {
     // Load the image asset
-    ByteData imageData = await rootBundle.load('assets/images/robface.png');
+    ByteData imageData = await rootBundle.load('assets/images/face.png');
 
     // Convert ByteData to Uint8List
     Uint8List uint8List = Uint8List.view(imageData.buffer);
@@ -104,15 +102,12 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: const Text('Process Image using c++'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
             Text(
               _screenText,
               style: Theme.of(context).textTheme.headlineMedium,
@@ -121,7 +116,7 @@ class _HomePageState extends State<HomePage> {
             SizedBox(
               height: 200,
               width: 200,
-              child: Image.asset('assets/images/robface.png'),
+              child: Image.asset('assets/images/face.png'),
             ),
             ElevatedButton(
               onPressed: _sendImage,
