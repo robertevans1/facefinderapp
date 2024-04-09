@@ -1,16 +1,7 @@
-# facefinder
+# Facefinder
 
-A project that calls the facefinder lib
+A project that demonstates how make use of image processing algorithms in c++ or python from a Flutter app.
 
-## Getting Started
+## Why?
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Image processing applications are often built using languages like c++, as those allow fast, precise analysis and manipulation of the image pixels. It's handy to be able to make use of these from a flutter app as then we can access those powerful image processing ability from an cross platform app.
