@@ -1,40 +1,20 @@
-import 'dart:ffi';
-import 'dart:io';
-
-import 'package:ffi/ffi.dart';
+import 'package:facefinder/image_processing/image_processing_module.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-typedef _HelloFunction = Pointer<Utf8> Function(Pointer<Utf8>);
-
-class TextTest extends StatefulWidget {
+class TextTest extends ConsumerStatefulWidget {
   const TextTest();
 
   @override
-  State<TextTest> createState() => _TextTestState();
+  ConsumerState<TextTest> createState() => _TextTestState();
 }
 
-class _TextTestState extends State<TextTest> {
+class _TextTestState extends ConsumerState<TextTest> {
   String? _screenText;
 
-  String _getLibraryPath() {
-    if (Platform.isAndroid) {
-      return 'libdetect_faces.so';
-    } else {
-      throw Exception('Unsupported platform');
-    }
-  }
-
   void _callHello(String input) async {
-    DynamicLibrary cppLib = DynamicLibrary.open(_getLibraryPath());
-    var helloFunc =
-        cppLib.lookupFunction<_HelloFunction, _HelloFunction>('hello');
-    var inputCString = input.toNativeUtf8();
-
-    // Call the native function with the C string
-    var resultPointer = helloFunc(inputCString);
-
-    // Convert the result back to Dart string
-    var resultString = resultPointer.toDartString();
+    var resultString =
+        await ref.read(imageProcessingRepositoryProvider).hello(input);
 
     setState(() {
       _screenText = 'Sent: $input\nReceived: $resultString';

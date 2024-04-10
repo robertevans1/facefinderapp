@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'navigation/routes.dart';
 
 void main() {
-  runApp(const FaceFinderApp());
+  runApp(const ProviderScope(child: FaceFinderApp()));
 }
 
 class FaceFinderApp extends StatelessWidget {
   const FaceFinderApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

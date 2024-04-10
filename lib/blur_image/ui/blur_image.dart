@@ -1,56 +1,21 @@
-import 'dart:ffi';
-import 'dart:io';
 import 'dart:ui' as ui;
 
-import 'package:ffi/ffi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-typedef ProcessImage = Pointer<Uint8> Function(
-    Pointer<Uint8>, Int32, Int32, Int32);
-typedef ProcessImageDart = Pointer<Uint8> Function(
-    Pointer<Uint8>, int, int, int);
+import '../../image_processing/image_processing_module.dart';
 
-class BlurImage extends StatefulWidget {
+class BlurImage extends ConsumerStatefulWidget {
   const BlurImage();
 
   @override
-  State<BlurImage> createState() => _BlurImageState();
+  ConsumerState<BlurImage> createState() => _BlurImageState();
 }
 
-class _BlurImageState extends State<BlurImage> {
+class _BlurImageState extends ConsumerState<BlurImage> {
   ui.Image? _resultImage;
   String? _processingTime;
-
-  String _getLibraryPath() {
-    if (Platform.isAndroid) {
-      return 'libdetect_faces.so';
-    } else {
-      throw Exception('Unsupported platform');
-    }
-  }
-
-  Future<Uint8List> _processImage(
-      Uint8List pixels, int width, int height) async {
-    DynamicLibrary cppLib = DynamicLibrary.open(_getLibraryPath());
-    var processImageFunc =
-        cppLib.lookupFunction<ProcessImage, ProcessImageDart>('blurImage');
-
-    final imgPtr = malloc.allocate<Uint8>(pixels.length);
-
-    imgPtr.asTypedList(pixels.length).setAll(0, pixels);
-
-    // Call the native function with the C string
-    var resultPointer = processImageFunc(imgPtr, width, height, 4);
-
-    // Copy result back into dart buffer
-    Uint8List resultPixels =
-        Uint8List.fromList(resultPointer.asTypedList(width * height * 4));
-
-    malloc.free(imgPtr);
-
-    return resultPixels;
-  }
 
   Future<void> _sendImage() async {
     Stopwatch stopwatch = Stopwatch()..start();
@@ -69,7 +34,9 @@ class _BlurImageState extends State<BlurImage> {
     ByteData? rawBytes = await frameInfo.image.toByteData();
     // Convert ByteData to Uint8List
     Uint8List rawUint8List = Uint8List.view(rawBytes!.buffer);
-    Uint8List processedImage = await _processImage(rawUint8List, width, height);
+    Uint8List processedImage = await ref
+        .read(imageProcessingRepositoryProvider)
+        .blurImage(rawUint8List, width, height);
     ui.decodeImageFromPixels(
         processedImage, width, height, ui.PixelFormat.rgba8888, (result) {
       setState(() {
